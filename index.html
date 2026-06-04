@@ -63,6 +63,19 @@
     html { scroll-behavior: smooth; }
     body { font-family: 'DM Sans', sans-serif; color: #0F172A; background: #fff; }
 
+    /* ---- ANTI-FOUC SVG ----
+       Tailwind (CDN) viene applicato via JavaScript DOPO il primo render.
+       Le icone e le frecce hanno la dimensione solo nelle classi Tailwind di
+       larghezza/altezza: finché Tailwind non carica, gli SVG non hanno
+       dimensione e diventano ENORMI, tracimando sul layout e facendolo
+       "ballare" allo scatto finale. Diamo un default nativo (24x24): è un
+       selettore di tipo (bassa specificità), quindi appena Tailwind applica
+       le sue classi queste prevalgono e ripristinano le misure corrette. */
+    svg { width: 1.5rem; height: 1.5rem; }
+    /* I due loghi non usano classi Tailwind: fisso la loro misura nativa. */
+    .nav-logo-text svg { width: 28px; height: 28px; }
+    footer svg { width: 24px; height: 24px; }
+
     /* ---- TOP BAR ---- */
     #top-bar {
       background: #0F172A;
@@ -165,6 +178,10 @@
       display: flex; align-items: center; justify-content: center;
       margin-bottom: 1.25rem;
     }
+    /* Dimensione nativa dell'icona SVG: senza questa, se Tailwind (via JS) è
+       ancora in caricamento l'SVG non ha dimensione e diventa enorme, facendo
+       "ballare" la card. Con la misura nativa resta sempre 24x24. */
+    .svc-icon svg { width: 1.5rem; height: 1.5rem; }
     .svc-title { color: #0F172A; font-weight: 600; font-size: 1.125rem; line-height: 1.35; margin-bottom: 0.5rem; }
     .svc-text  { color: #475569; font-size: 0.875rem; line-height: 1.6; }
     /* margin-top:auto ancora il tag SEMPRE in fondo alla card, qualunque sia
@@ -178,6 +195,24 @@
       padding: 0.25rem 0.75rem;
       border-radius: 9999px;
     }
+    /* Sezione servizi resa AUTONOMA con CSS nativo: non dipende dalle classi
+       Tailwind (che si applicano via JS dopo il render), quindi non "scatta"
+       in posizione mentre Tailwind carica. Si disegna giusta e ferma da subito. */
+    .svc-section { background: #F8FAFC; padding: 6rem 1.5rem; }
+    .svc-container { max-width: 80rem; margin: 0 auto; }
+    .svc-head { text-align: center; margin-bottom: 3.5rem; }
+    .svc-eyebrow {
+      color: #10B981; font-size: 0.875rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .svc-h2 {
+      font-family: 'DM Serif Display', serif; color: #0F172A;
+      font-size: 2.5rem; line-height: 1.1; margin-bottom: 1rem;
+    }
+    .svc-sub {
+      color: #475569; max-width: 36rem; margin: 0 auto; line-height: 1.6;
+    }
+    @media (min-width: 768px) { .svc-h2 { font-size: 3rem; } }
 
     /* ---- SEZIONE INCENTIVI ---- */
     #incentivi {
@@ -479,14 +514,14 @@
        4 card con icona SVG, titolo e descrizione.
        Hover: si alzano leggermente con bordo verde.
   ============================================================ -->
-  <section id="servizi" class="bg-slate50 py-24">
-    <div class="max-w-7xl mx-auto px-6">
+  <section id="servizi" class="svc-section">
+    <div class="svc-container">
 
-      <!-- Intestazione sezione -->
-      <div class="text-center mb-14 fade-in-up">
-        <p class="text-eco text-sm font-semibold tracking-widest uppercase mb-3">Le Nostre Divisioni</p>
-        <h2 class="font-display text-navy text-4xl md:text-5xl mb-4">Cosa facciamo</h2>
-        <p class="text-slate-600 max-w-xl mx-auto leading-relaxed">
+      <!-- Intestazione sezione (CSS nativo, niente animazione = niente scatto) -->
+      <div class="svc-head">
+        <p class="svc-eyebrow">Le Nostre Divisioni</p>
+        <h2 class="svc-h2">Cosa facciamo</h2>
+        <p class="svc-sub">
           Dalla progettazione all'assistenza post-installazione: un interlocutore unico
           per ogni esigenza termoidraulica, civile o industriale.
         </p>
