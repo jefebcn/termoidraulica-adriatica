@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Termoidraulica Adriatica — Rimini & San Marino</title>
+
+  <!-- ============================================================
+       FONT: DM Sans (body) + DM Serif Display (titoli hero)
+       Scelta: abbinamento istituzionale ma non piatto — il Serif
+       dà peso e autorevolezza ai titoli grandi, il Sans tiene
+       tutto leggibile e moderno nel corpo testo.
+  ============================================================ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+
+  <!-- ============================================================
+       TAILWIND CDN — solo per prototipo/bozza.
+       In produzione sostituire con build Tailwind CLI.
+  ============================================================ -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ============================================================
+       TAILWIND CONFIG: estensione del tema con la palette e i font
+       custom di Termoidraulica Adriatica.
+  ============================================================ -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            /* Colore primario — Navy profondo: autorità e solidità */
+            navy:    '#0F172A',
+            /* Colore secondario — Blu idraulico/tecnologico */
+            tech:    '#1D4ED8',
+            'tech-light': '#3B82F6',
+            /* Colore accento — Verde smeraldo: eco, rinnovabili */
+            eco:     '#10B981',
+            'eco-dark':  '#059669',
+            /* Grigi neutri per sfondi e testi secondari */
+            slate50: '#F8FAFC',
+            slate100:'#F1F5F9',
+            slate400:'#94A3B8',
+            slate600:'#475569',
+          },
+          fontFamily: {
+            sans:    ['"DM Sans"', 'sans-serif'],
+            display: ['"DM Serif Display"', 'serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- ============================================================
+       STILI CUSTOM — tutto ciò che Tailwind non copre nativamente:
+       animazioni, gradiente hero, backdrop-blur navbar, ecc.
+  ============================================================ -->
+  <style>
+    /* Reset e base */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; color: #0F172A; background: #fff; }
+
+    /* ---- TOP BAR ---- */
+    #top-bar {
+      background: #0F172A;
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ---- NAVBAR STICKY ---- */
+    /* Stato iniziale: trasparente sopra l'hero */
+    #main-nav {
+      position: fixed;
+      top: 2.25rem; /* altezza top-bar */
+      left: 0; right: 0;
+      z-index: 50;
+      transition: background 0.3s ease, box-shadow 0.3s ease, top 0.3s ease;
+    }
+    /* Classe aggiunta via JS allo scroll: sfondo bianco + blur */
+    #main-nav.scrolled {
+      top: 0;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 1px 0 rgba(15,23,42,0.08), 0 4px 24px rgba(15,23,42,0.06);
+    }
+    #main-nav.scrolled .nav-logo-text { color: #0F172A; }
+    #main-nav.scrolled .nav-link      { color: #475569; }
+    #main-nav.scrolled .nav-link:hover { color: #0F172A; }
+
+    /* Stato iniziale nav (sopra hero scuro) */
+    .nav-logo-text { color: #fff; font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; transition: color 0.3s; }
+    .nav-link { color: rgba(255,255,255,0.85); font-size: 0.875rem; font-weight: 500; transition: color 0.2s; text-decoration: none; }
+    .nav-link:hover { color: #fff; }
+
+    /* ---- HERO ---- */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      /* Immagine placeholder hero: operai su impianto industriale moderno */
+      background-image:
+        linear-gradient(135deg, rgba(15,23,42,0.88) 0%, rgba(15,23,42,0.60) 55%, rgba(29,78,216,0.35) 100%),
+        url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1600&q=80&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+    }
+    /* Linea decorativa verde accanto al titolo hero */
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 2.5rem;
+      height: 2px;
+      background: #10B981;
+      vertical-align: middle;
+      margin-right: 0.75rem;
+    }
+
+    /* ---- NUMERI / TRUST STRIP ---- */
+    /* Effetto bordo sottile tra le colonne */
+    .stat-divider:not(:last-child) {
+      border-right: 1px solid rgba(15,23,42,0.08);
+    }
+
+    /* ---- CARD SERVIZI ---- */
+    /* height:100% garantisce che ogni card occupi tutta l'altezza
+       della riga della griglia, indipendentemente dal contenuto */
+    .service-card {
+      border: 1px solid #F1F5F9;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(15,23,42,0.10);
+      border-color: #10B981;
+    }
+    /* Icona cerchio colorato nelle card */
+    .icon-wrap {
+      width: 3rem; height: 3rem;
+      border-radius: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ---- SEZIONE INCENTIVI ---- */
+    #incentivi {
+      background: linear-gradient(135deg, #0F172A 0%, #1e3a5f 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Pattern puntini decorativo in background */
+    #incentivi::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(16,185,129,0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ---- PORTFOLIO ---- */
+    .portfolio-card {
+      overflow: hidden;
+      border-radius: 1rem;
+      position: relative;
+    }
+    .portfolio-card img {
+      transition: transform 0.4s ease;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .portfolio-card:hover img { transform: scale(1.04); }
+    .portfolio-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(15,23,42,0.85) 0%, transparent 55%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .portfolio-card:hover .portfolio-overlay { opacity: 1; }
+
+    /* ---- FORM CONTATTO ---- */
+    .form-field {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 0.625rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: #0F172A;
+      background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+    .form-field:focus {
+      border-color: #1D4ED8;
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.10);
+    }
+    .form-field::placeholder { color: #94A3B8; }
+
+    /* ---- MOBILE MENU ---- */
+    #mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: #fff;
+      border-top: 1px solid #F1F5F9;
+      padding: 1rem 1.5rem 1.5rem;
+      gap: 0.25rem;
+    }
+    #mobile-menu.open { display: flex; }
+    .mobile-nav-link {
+      padding: 0.6rem 0;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #0F172A;
+      border-bottom: 1px solid #F1F5F9;
+      text-decoration: none;
+    }
+
+    /* ---- ANIMAZIONE FADE-IN SEZIONI ---- */
+    .fade-in-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .fade-in-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- FOOTER ---- */
+    footer { background: #0F172A; }
+    .footer-link { color: #94A3B8; font-size: 0.8rem; text-decoration: none; transition: color 0.2s; }
+    .footer-link:hover { color: #fff; }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       TOP BAR
+       Fascia sottile fissa in cima: recapiti rapidi e zona operativa.
+       Visibile solo su desktop (nascosta su mobile per non occupare
+       troppo spazio verticale).
+  ============================================================ -->
+  <div id="top-bar" class="hidden md:block fixed top-0 left-0 right-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
+      <!-- Zona geografica operativa -->
+      <span class="text-slate-400 text-xs tracking-wide">
+        Operativi a Rimini, San Marino e province limitrofe
+      </span>
+      <!-- Recapiti rapidi: telefono, email, orari -->
+      <div class="flex items-center gap-6 text-slate-300">
+        <!-- Telefono sede -->
+        <a href="tel:+390541388100" class="flex items-center gap-1.5 hover:text-white transition-colors">
+          <svg class="w-3.5 h-3.5 text-eco" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+          0541 388100
+        </a>
+        <!-- Email -->
+        <a href="mailto:info@termoidraulicaadriatica.it" class="flex items-center gap-1.5 hover:text-white transition-colors">
+          <svg class="w-3.5 h-3.5 text-eco" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/>
+          </svg>
+          info@termoidraulicaadriatica.it <!-- placeholder email -->
+        </a>
+        <!-- Orari ufficio -->
+        <span class="flex items-center gap-1.5 text-slate-400">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
+          </svg>
+          Lun–Ven 8:00–12:00 · 14:00–18:00
+        </span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       NAVBAR PRINCIPALE (STICKY)
+       Parte trasparente sopra l'hero, poi diventa bianca/blur
+       allo scroll tramite la classe JS ".scrolled".
+       Su mobile mostra solo logo + hamburger.
+  ============================================================ -->
+  <nav id="main-nav">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+      <!-- Logo testuale -->
+      <a href="#" class="nav-logo-text flex items-center gap-2">
+        <!-- Icona tecnica semplice a fianco del nome -->
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="6" fill="#10B981"/>
+          <path d="M8 14h4M16 14h4M14 8v4M14 16v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="14" cy="14" r="3" stroke="white" stroke-width="2"/>
+        </svg>
+        Termoidraulica Adriatica
+      </a>
+
+      <!-- Link navigazione — desktop only -->
+      <div class="hidden lg:flex items-center gap-7">
+        <a href="#azienda"   class="nav-link">Azienda</a>
+        <a href="#servizi"   class="nav-link">Servizi</a>
+        <a href="#green"     class="nav-link">Innovazione Green</a>
+        <a href="#portfolio" class="nav-link">Realizzazioni</a>
+        <a href="#contatti"  class="nav-link">Contatti</a>
+      </div>
+
+      <!-- CTA desktop + hamburger mobile -->
+      <div class="flex items-center gap-3">
+        <!-- Pulsante CTA principale -->
+        <a href="#contatti"
+           class="hidden md:inline-flex items-center gap-2 bg-eco hover:bg-eco-dark text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors">
+          Richiedi un Sopralluogo
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <!-- Hamburger — solo mobile -->
+        <button id="menu-toggle" class="lg:hidden p-2 rounded-md" aria-label="Apri menu">
+          <svg id="icon-open"  class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg id="icon-close" class="w-6 h-6 text-white hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Menu mobile espandibile -->
+    <div id="mobile-menu">
+      <a href="#azienda"   class="mobile-nav-link">Azienda</a>
+      <a href="#servizi"   class="mobile-nav-link">Servizi</a>
+      <a href="#green"     class="mobile-nav-link">Innovazione Green</a>
+      <a href="#portfolio" class="mobile-nav-link">Realizzazioni</a>
+      <a href="#contatti"  class="mobile-nav-link">Contatti</a>
+      <a href="#contatti"
+         class="mt-3 inline-flex justify-center items-center gap-2 bg-eco text-white text-sm font-semibold px-5 py-3 rounded-lg">
+        Richiedi un Sopralluogo
+      </a>
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       HERO SECTION
+       Immagine di sfondo scura con overlay navy→blu, titolo grande
+       in DM Serif Display, due CTA.
+  ============================================================ -->
+  <section id="hero">
+    <div class="max-w-7xl mx-auto px-6 pt-32 pb-24">
+      <div class="max-w-3xl">
+
+        <!-- Etichetta sopra il titolo con linea verde -->
+        <p class="hero-eyebrow text-eco text-sm font-semibold tracking-widest uppercase mb-6">
+          Rimini · San Marino · Province limitrofe
+        </p>
+
+        <!-- Titolo principale -->
+        <h1 class="font-display text-white text-5xl md:text-6xl lg:text-7xl leading-tight mb-6">
+          Comfort, Innovazione<br/>
+          ed Efficienza Energetica<br/>
+          <em>per la tua Casa<br/>o la tua Impresa.</em>
+        </h1>
+
+        <!-- Sottotitolo -->
+        <p class="text-slate-300 text-lg md:text-xl leading-relaxed mb-10 max-w-2xl">
+          Termoidraulica Adriatica: progettazione e installazione di impianti termoidraulici,
+          climatizzazione e sistemi a energia rinnovabile tra Rimini e San Marino.
+        </p>
+
+        <!-- Due pulsanti CTA -->
+        <div class="flex flex-wrap gap-4">
+          <!-- CTA primario — verde eco -->
+          <a href="#contatti"
+             class="inline-flex items-center gap-2 bg-eco hover:bg-eco-dark text-white font-semibold px-7 py-4 rounded-xl text-base transition-colors">
+            Richiedi un Preventivo
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <!-- CTA secondario — outline bianco -->
+          <a href="#servizi"
+             class="inline-flex items-center gap-2 border-2 border-white/40 hover:border-white text-white font-semibold px-7 py-4 rounded-xl text-base transition-colors">
+            Scopri i Nostri Servizi
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Freccia scroll-down animata -->
+    <a href="#azienda" aria-label="Scorri verso il basso" class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer">
+      <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M19 9l-7 7-7-7"/>
+      </svg>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       TRUST STRIP — I NOSTRI NUMERI
+       Fascia orizzontale compatta con 4 statistiche chiave.
+       Trasmette credibilità immediatamente dopo l'hero.
+  ============================================================ -->
+  <section id="azienda" class="bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-6 py-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-0">
+
+        <!-- Statistica 1 -->
+        <div class="stat-divider text-center px-6 py-4 fade-in-up">
+          <p class="font-display text-4xl md:text-5xl text-navy mb-1">50<span class="text-eco">+</span></p>
+          <p class="text-slate-600 text-sm font-medium">Anni di esperienza</p>
+        </div>
+
+        <!-- Statistica 2 -->
+        <div class="stat-divider text-center px-6 py-4 fade-in-up" style="transition-delay:0.1s">
+          <p class="font-display text-4xl md:text-5xl text-navy mb-1">3.000<span class="text-eco">+</span></p>
+          <p class="text-slate-600 text-sm font-medium">Impianti realizzati</p>
+        </div>
+
+        <!-- Statistica 3 -->
+        <div class="stat-divider text-center px-6 py-4 fade-in-up" style="transition-delay:0.2s">
+          <p class="font-display text-4xl md:text-5xl text-navy mb-1">H24</p>
+          <p class="text-slate-600 text-sm font-medium">Assistenza certificata</p>
+        </div>
+
+        <!-- Statistica 4 -->
+        <div class="text-center px-6 py-4 fade-in-up" style="transition-delay:0.3s">
+          <p class="font-display text-4xl md:text-5xl text-navy mb-1">2</p>
+          <p class="text-slate-600 text-sm font-medium">Regioni servite (RN + SM)</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       GRIGLIA SERVIZI — LE NOSTRE DIVISIONI
+       4 card con icona SVG, titolo e descrizione.
+       Hover: si alzano leggermente con bordo verde.
+  ============================================================ -->
+  <section id="servizi" class="bg-slate50 py-24">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Intestazione sezione -->
+      <div class="text-center mb-14 fade-in-up">
+        <p class="text-eco text-sm font-semibold tracking-widest uppercase mb-3">Le Nostre Divisioni</p>
+        <h2 class="font-display text-navy text-4xl md:text-5xl mb-4">Cosa facciamo</h2>
+        <p class="text-slate-600 max-w-xl mx-auto leading-relaxed">
+          Dalla progettazione all'assistenza post-installazione: un interlocutore unico
+          per ogni esigenza termoidraulica, civile o industriale.
+        </p>
+      </div>
+
+      <!-- Grid 4 colonne (2 su tablet, 1 su mobile) -->
+      <!-- items-stretch: ogni card riempie l'intera altezza della riga della griglia,
+           quindi tutte le card della stessa riga sono alte uguale.
+           IMPORTANTE: l'animazione fade-in è applicata QUI, sul contenitore, e non
+           sulle singole card. Animando le card una per una con transition-delay
+           diversi (0.1s, 0.2s, 0.3s) sembravano sfalsate / di altezze diverse
+           durante l'ingresso nello schermo: ora salgono tutte insieme e restano
+           sempre perfettamente allineate. -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch fade-in-up">
+
+        <!-- Card 1 — Impianti Civili & Riscaldamento -->
+        <!-- flex flex-col h-full: la card riempie la cella e impagina il contenuto
+             in colonna, così il tag colorato può restare ancorato in fondo -->
+        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
+          <div class="icon-wrap bg-blue-50 mb-5">
+            <svg class="w-6 h-6 text-tech" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Impianti Civili<br/>& Riscaldamento</h3>
+          <!-- flex-1: il testo occupa tutto lo spazio disponibile, spingendo il tag sempre in fondo -->
+          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+            Caldaie a condensazione, riscaldamento a pavimento, sostituzione generatori
+            e manutenzione periodica certificata.
+          </p>
+          <span class="mt-5 inline-block text-xs font-semibold text-tech bg-blue-50 px-3 py-1 rounded-full self-start">Residenziale</span>
+        </div>
+
+        <!-- Card 2 — Climatizzazione & Trattamento Aria -->
+        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
+          <div class="icon-wrap bg-sky-50 mb-5">
+            <svg class="w-6 h-6 text-sky-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/>
+            </svg>
+          </div>
+          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Climatizzazione<br/>& Trattamento Aria</h3>
+          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+            Sistemi di condizionamento residenziali e industriali ad alta efficienza.
+            VMC e purificazione aria per ambienti di lavoro.
+          </p>
+          <span class="mt-5 inline-block text-xs font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full self-start">Civile & Industriale</span>
+        </div>
+
+        <!-- Card 3 — Energie Rinnovabili & Green -->
+        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
+          <div class="icon-wrap bg-green-50 mb-5">
+            <svg class="w-6 h-6 text-eco" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path d="M12 22V12M12 12C12 7 17 4 17 4s-1 8-5 8zM12 12C12 7 7 4 7 4s1 8 5 8z"/>
+              <path d="M5 22h14"/>
+            </svg>
+          </div>
+          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Energie Rinnovabili<br/>& Green</h3>
+          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+            Pompe di calore, solare termico e fotovoltaico. Massimo risparmio in bolletta
+            con gli incentivi fiscali vigenti.
+          </p>
+          <span class="mt-5 inline-block text-xs font-semibold text-eco bg-green-50 px-3 py-1 rounded-full self-start">Ecosostenibile</span>
+        </div>
+
+        <!-- Card 4 — Impianti Industriali & Condominiali -->
+        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
+          <div class="icon-wrap bg-orange-50 mb-5">
+            <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <rect x="2" y="7" width="20" height="14" rx="1"/>
+              <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+              <line x1="12" y1="12" x2="12" y2="16"/>
+              <line x1="10" y1="14" x2="14" y2="14"/>
+            </svg>
+          </div>
+          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Impianti Industriali<br/>& Condominiali</h3>
+          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+            Soluzioni complesse per aziende, hotel e gestione di centrali termiche
+            condominiali. Contratti di manutenzione annuali.
+          </p>
+          <span class="mt-5 inline-block text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full self-start">B2B & Condomini</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SEZIONE INCENTIVI & RISPARMIO
+       Sfondo navy con pattern puntini CSS puro, senza div annidati
+       con margini conflittuali. Padding orizzontale gestito solo
+       dalla section esterna per evitare problemi di layout.
+  ============================================================ -->
+  <section id="green" class="py-24 px-6">
+    <div style="
+      max-width: 80rem;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #0F172A 0%, #1e3a5f 100%);
+      border-radius: 1.5rem;
+      padding: 4rem 4rem;
+      position: relative;
+      overflow: hidden;
+    ">
+      <!-- Pattern puntini decorativo -->
+      <div style="
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle, rgba(16,185,129,0.12) 1px, transparent 1px);
+        background-size: 28px 28px;
+        pointer-events: none;
+      "></div>
+
+      <!-- Contenuto -->
+      <div style="position: relative; z-index: 10; max-width: 56rem;">
+
+        <!-- Etichetta -->
+        <p class="text-eco text-sm font-semibold tracking-widest uppercase mb-4 fade-in-up">
+          Incentivi & Risparmio
+        </p>
+
+        <!-- Titolo -->
+        <h2 class="font-display text-white text-4xl md:text-5xl leading-tight mb-6 fade-in-up">
+          Sfruttiamo gli eco-incentivi<br/>
+          fiscali <em>al posto tuo.</em>
+        </h2>
+
+        <p class="text-slate-300 text-lg leading-relaxed mb-10 max-w-2xl fade-in-up">
+          Detrazioni fiscali, Conto Termico, incentivi per la riqualificazione energetica:
+          il nostro team ti guida in ogni pratica burocratica e ti aiuta ad abbattere
+          i costi di installazione fino al 65%.
+        </p>
+
+        <!-- Tre pillole beneficio -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 fade-in-up">
+          <div class="flex items-start gap-3 rounded-xl p-4" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)">
+            <span class="text-eco text-xl font-bold">65%</span>
+            <p class="text-slate-300 text-sm">Detrazione fiscale massima per la riqualificazione energetica</p>
+          </div>
+          <div class="flex items-start gap-3 rounded-xl p-4" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)">
+            <span class="text-eco text-xl font-bold">0€</span>
+            <p class="text-slate-300 text-sm">Consulenza preliminare sulle agevolazioni disponibili</p>
+          </div>
+          <div class="flex items-start gap-3 rounded-xl p-4" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1)">
+            <span class="text-eco text-xl font-bold">–30%</span>
+            <p class="text-slate-300 text-sm">Risparmio medio annuo in bolletta con pompa di calore A+++</p>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <a href="#contatti"
+           class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-navy font-semibold px-7 py-4 rounded-xl text-base transition-colors fade-in-up">
+          Scopri come risparmiare
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       CERTIFICAZIONI & PARTNER
+       Loghi placeholder che certificano le abilitazioni di legge
+       e i brand di prodotto installati.
+  ============================================================ -->
+  <section class="bg-slate50 py-20 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <p class="text-center text-slate-400 text-sm font-medium tracking-widest uppercase mb-10 fade-in-up">
+        Certificazioni & Partner Ufficiali
+      </p>
+
+      <!-- Griglia badge certificazioni — placeholder grafici -->
+      <div class="flex flex-wrap justify-center items-center gap-6 md:gap-10 fade-in-up">
+        <!-- Ogni badge è un rettangolo grigio con testo — da sostituire con loghi reali -->
+        <div class="h-12 px-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+          <span class="text-slate-500 text-sm font-semibold tracking-wide">FGAS Certificato</span>
+        </div>
+        <div class="h-12 px-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+          <span class="text-slate-500 text-sm font-semibold tracking-wide">Regola d'Arte L.46</span>
+        </div>
+        <div class="h-12 px-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+          <span class="text-slate-500 text-sm font-semibold tracking-wide">Partner Vaillant</span>
+        </div>
+        <div class="h-12 px-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+          <span class="text-slate-500 text-sm font-semibold tracking-wide">Partner Daikin</span>
+        </div>
+        <div class="h-12 px-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+          <span class="text-slate-500 text-sm font-semibold tracking-wide">Partner Ariston</span>
+        </div>
+        <div class="h-12 px-6 bg-white border border-slate-200 rounded-lg flex items-center justify-center">
+          <span class="text-slate-500 text-sm font-semibold tracking-wide">ISO 9001:2015</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       PORTFOLIO — LAVORI RECENTI
+       Griglia 3 card con immagine Unsplash (placeholder reale),
+       overlay scuro al hover con titolo e descrizione progetto.
+  ============================================================ -->
+  <section id="portfolio" class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Intestazione -->
+      <div class="text-center mb-14 fade-in-up">
+        <p class="text-eco text-sm font-semibold tracking-widest uppercase mb-3">Realizzazioni</p>
+        <h2 class="font-display text-navy text-4xl md:text-5xl mb-4">Lavori recenti</h2>
+        <p class="text-slate-600 max-w-lg mx-auto leading-relaxed">
+          Alcuni dei progetti completati sul territorio di Rimini, San Marino
+          e province limitrofe.
+        </p>
+      </div>
+
+      <!-- Griglia 3 colonne -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Progetto 1 — Impianto radiante villa San Marino -->
+        <div class="portfolio-card h-72 fade-in-up">
+          <!-- foto da aggiungere -->
+          <img
+            src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=75&auto=format&fit=crop"
+            alt="foto da aggiungere — impianto radiante" />
+          <!-- Info progetto visibili all'hover -->
+          <div class="portfolio-overlay">
+            <span class="text-eco text-xs font-semibold uppercase tracking-widest mb-1">San Marino · 2024</span>
+            <h3 class="text-white font-semibold text-lg">Impianto Radiante — Villa Privata</h3>
+            <p class="text-slate-300 text-sm mt-1">Riscaldamento a pavimento su due livelli, caldaia a condensazione A+.</p>
+          </div>
+        </div>
+
+        <!-- Progetto 2 — Climatizzazione hotel Rimini -->
+        <div class="portfolio-card h-72 fade-in-up" style="transition-delay:0.1s">
+          <!-- foto da aggiungere -->
+          <img
+            src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=75&auto=format&fit=crop"
+            alt="foto da aggiungere — climatizzazione hotel" />
+          <div class="portfolio-overlay">
+            <span class="text-eco text-xs font-semibold uppercase tracking-widest mb-1">Rimini · 2024</span>
+            <h3 class="text-white font-semibold text-lg">Climatizzazione Hotel</h3>
+            <p class="text-slate-300 text-sm mt-1">Sistema VRV multi-split ad alta efficienza per 48 camere.</p>
+          </div>
+        </div>
+
+        <!-- Progetto 3 — Centrale termica industriale -->
+        <div class="portfolio-card h-72 fade-in-up" style="transition-delay:0.2s">
+          <!-- foto da aggiungere -->
+          <img
+            src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&q=75&auto=format&fit=crop"
+            alt="foto da aggiungere — centrale termica industriale" />
+          <div class="portfolio-overlay">
+            <span class="text-eco text-xs font-semibold uppercase tracking-widest mb-1">Provincia RN · 2023</span>
+            <h3 class="text-white font-semibold text-lg">Centrale Termica Industriale</h3>
+            <p class="text-slate-300 text-sm mt-1">Rifacimento completo centrale termica per capannone da 4.000 m².</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       RECENSIONI GOOGLE
+       Le prime 3 recensioni con testo completo prese da Google Maps.
+       Sezione posizionata tra portfolio e form contatto per
+       rinforzare la fiducia prima della chiamata all'azione finale.
+  ============================================================ -->
+  <section class="py-24 bg-slate50 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Intestazione -->
+      <div class="text-center mb-14 fade-in-up">
+        <p class="text-eco text-sm font-semibold tracking-widest uppercase mb-3">Recensioni</p>
+        <h2 class="font-display text-navy text-4xl md:text-5xl mb-4">Cosa dicono i clienti</h2>
+        <!-- Stelle medie + badge Google -->
+        <div class="flex items-center justify-center gap-3 mt-4">
+          <div class="flex gap-1">
+            <!-- 5 stelle piene -->
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          </div>
+          <span class="text-navy font-semibold text-sm">5.0</span>
+          <span class="text-slate-400 text-sm">su Google</span>
+        </div>
+      </div>
+
+      <!-- Griglia 3 card recensioni -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Recensione 1 — Mauro Vanucci -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm fade-in-up">
+          <!-- Virgolette decorative -->
+          <div class="text-eco text-4xl font-display leading-none mb-4 select-none">"</div>
+          <p class="text-slate-700 text-sm leading-relaxed mb-6">
+            L'attività svolta dai tecnici è stata caratterizzata da un'ottima professionalità
+            e competenza. Il front office telefonico ha fornito tempestivamente assistenza
+            soddisfacendo le richieste presentate.
+          </p>
+          <!-- Footer card: nome + stelle + data -->
+          <div class="flex items-center justify-between mt-auto">
+            <div>
+              <p class="text-navy font-semibold text-sm">Mauro Vanucci</p>
+              <p class="text-slate-400 text-xs">Local Guide · 3 anni fa</p>
+            </div>
+            <div class="flex gap-0.5">
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recensione 2 — Paola Carrozza -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm fade-in-up" style="transition-delay:0.1s">
+          <div class="text-eco text-4xl font-display leading-none mb-4 select-none">"</div>
+          <p class="text-slate-700 text-sm leading-relaxed mb-6">
+            Ho fatto i lavori in casa, molto professionali e molto vicini ai clienti.
+            Silvia è davvero speciale.
+          </p>
+          <div class="flex items-center justify-between mt-auto">
+            <div>
+              <p class="text-navy font-semibold text-sm">Paola Carrozza</p>
+              <p class="text-slate-400 text-xs">6 anni fa</p>
+            </div>
+            <div class="flex gap-0.5">
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recensione 3 — Salva Simo -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-100 shadow-sm fade-in-up" style="transition-delay:0.2s">
+          <div class="text-eco text-4xl font-display leading-none mb-4 select-none">"</div>
+          <p class="text-slate-700 text-sm leading-relaxed mb-6">
+            Professionali e vicino ai clienti, molto preparati per qualsiasi lavoro
+            richiesto. Sempre al top!
+          </p>
+          <div class="flex items-center justify-between mt-auto">
+            <div>
+              <p class="text-navy font-semibold text-sm">Salva Simo</p>
+              <p class="text-slate-400 text-xs">Local Guide · 6 anni fa</p>
+            </div>
+            <div class="flex gap-0.5">
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FORM CONTATTO
+       Colonna sinistra: info di contatto + indirizzo.
+       Colonna destra: form con campi strutturati per privati e aziende.
+  ============================================================ -->
+  <section id="contatti" class="py-24 bg-slate50 border-t border-slate-100">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+
+        <!-- ---- Colonna sinistra: info contatto ---- -->
+        <div class="fade-in-up">
+          <p class="text-eco text-sm font-semibold tracking-widest uppercase mb-3">Contatti</p>
+          <h2 class="font-display text-navy text-4xl md:text-5xl leading-tight mb-5">
+            Parliamo del<br/>tuo impianto.
+          </h2>
+          <p class="text-slate-600 leading-relaxed mb-10">
+            Che tu stia valutando una nuova installazione, una manutenzione urgente
+            o voglia conoscere gli incentivi disponibili: compila il form o
+            chiamaci direttamente.
+          </p>
+
+          <!-- Lista recapiti -->
+          <div class="space-y-5">
+            <!-- Telefono -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-eco/10 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-eco" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-navy font-semibold text-sm mb-0.5">Telefono</p>
+                <a href="tel:+390541388100" class="text-slate-600 hover:text-navy transition-colors">0541 388100</a>
+              </div>
+            </div>
+            <!-- Email -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-eco/10 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-eco" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,12 2,6"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-navy font-semibold text-sm mb-0.5">Email</p>
+                <a href="mailto:info@termoidraulicaadriatica.it" class="text-slate-600 hover:text-navy transition-colors text-sm">
+                  info@termoidraulicaadriatica.it
+                </a>
+              </div>
+            </div>
+            <!-- Indirizzo -->
+            <div class="flex items-start gap-4">
+              <div class="w-10 h-10 bg-eco/10 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-eco" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-navy font-semibold text-sm mb-0.5">Sede</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=Via+Giulio+Pastore+39+Rimini" target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-navy transition-colors text-sm flex items-center gap-1">Via Giulio Pastore, 39 — 47922 Rimini (RN)<svg class="w-3.5 h-3.5 shrink-0 opacity-50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- Colonna destra: form ---- -->
+        <div class="bg-white rounded-2xl p-8 md:p-10 shadow-sm border border-slate-100 fade-in-up" style="transition-delay:0.15s">
+
+          <h3 class="text-navy font-semibold text-xl mb-6">Richiedi un contatto tecnico</h3>
+
+          <!-- NOTA: action e method andrebbero configurati lato server -->
+          <!-- Per ora il JS gestisce la simulazione di invio -->
+          <div id="contact-form" class="space-y-4">
+
+            <!-- Nome / Ragione sociale -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-navy mb-1.5">Nome <span class="text-eco">*</span></label>
+                <input type="text" id="f-nome" placeholder="Mario Rossi" class="form-field" required />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-navy mb-1.5">Azienda / Condominio</label>
+                <input type="text" id="f-azienda" placeholder="(opzionale)" class="form-field" />
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Email <span class="text-eco">*</span></label>
+              <input type="email" id="f-email" placeholder="mario@email.it" class="form-field" required />
+            </div>
+
+            <!-- Telefono -->
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Telefono</label>
+              <input type="tel" id="f-tel" placeholder="0541 388100" class="form-field" />
+            </div>
+
+            <!-- Tipo di impianto — select -->
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Tipo di intervento <span class="text-eco">*</span></label>
+              <select id="f-tipo" class="form-field" required>
+                <option value="" disabled selected>Seleziona un'opzione</option>
+                <option>Nuovo impianto di riscaldamento</option>
+                <option>Climatizzazione / aria condizionata</option>
+                <option>Pompa di calore o solare termico</option>
+                <option>Manutenzione o riparazione urgente</option>
+                <option>Impianto industriale / condominiale</option>
+                <option>Consulenza incentivi fiscali</option>
+                <option>Altro</option>
+              </select>
+            </div>
+
+            <!-- Messaggio -->
+            <div>
+              <label class="block text-sm font-medium text-navy mb-1.5">Messaggio</label>
+              <textarea id="f-msg" rows="4" placeholder="Descrivi brevemente la tua esigenza..." class="form-field resize-none"></textarea>
+            </div>
+
+            <!-- Privacy + invio -->
+            <div class="flex items-start gap-3">
+              <input type="checkbox" id="f-privacy" class="mt-1 accent-eco" required />
+              <label for="f-privacy" class="text-slate-600 text-xs leading-relaxed">
+                Ho letto e accetto la
+                <a href="#" class="text-tech hover:underline">Privacy Policy</a>.
+                I dati forniti saranno trattati ai sensi del GDPR 2016/679.
+              </label>
+            </div>
+
+            <!-- Pulsante invio -->
+            <button id="submit-btn" onclick="handleFormSubmit(event)"
+                    class="w-full bg-eco hover:bg-eco-dark text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+              Invia Richiesta
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+
+            <!-- Messaggio di conferma (nascosto, mostrato via JS dopo invio) -->
+            <div id="form-success"
+                 class="hidden bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 text-sm text-center">
+              ✓ Richiesta inviata con successo! Ti contatteremo entro 24 ore.
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER ISTITUZIONALE
+       Tre colonne: info azienda + note legali | link rapidi | contatti.
+       Riga inferiore: copyright e P.IVA.
+  ============================================================ -->
+  <footer class="py-14">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Griglia footer: 3 colonne su desktop -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10 border-b border-white/10">
+
+        <!-- Colonna 1 — Identità azienda -->
+        <div>
+          <!-- Logo ripetuto nel footer -->
+          <div class="flex items-center gap-2 mb-4">
+            <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="6" fill="#10B981"/>
+              <path d="M8 14h4M16 14h4M14 8v4M14 16v4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="14" cy="14" r="3" stroke="white" stroke-width="2"/>
+            </svg>
+            <span class="text-white font-semibold text-sm">Termoidraulica Adriatica</span>
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed mb-5">
+            Progettazione e installazione di impianti termoidraulici, climatizzazione
+            e sistemi a energia rinnovabile. Operativi a Rimini, San Marino e province.
+          </p>
+          <!-- Dati legali obbligatori -->
+          <div class="space-y-1">
+            <p class="text-slate-500 text-xs">P.IVA: IT 00354780405</p>
+            <p class="text-slate-500 text-xs">REA: RN-147454</p>
+            <p class="text-slate-500 text-xs">Cap. Sociale: da definire con il cliente</p>
+            <a href="https://www.google.com/maps/search/?api=1&query=Via+Giulio+Pastore+39+Rimini" target="_blank" rel="noopener noreferrer" class="text-slate-500 text-xs hover:text-slate-300 transition-colors">Sede Legale: Via Giulio Pastore, 39 — 47922 Rimini (RN) ↗</a>
+          </div>
+        </div>
+
+        <!-- Colonna 2 — Link rapidi -->
+        <div>
+          <p class="text-white text-sm font-semibold mb-4">Navigazione</p>
+          <ul class="space-y-2">
+            <li><a href="#azienda"   class="footer-link">L'Azienda</a></li>
+            <li><a href="#servizi"   class="footer-link">I Nostri Servizi</a></li>
+            <li><a href="#green"     class="footer-link">Innovazione Green</a></li>
+            <li><a href="#portfolio" class="footer-link">Realizzazioni</a></li>
+            <li><a href="#contatti"  class="footer-link">Contatti</a></li>
+          </ul>
+          <p class="text-white text-sm font-semibold mt-6 mb-3">Legale</p>
+          <ul class="space-y-2">
+            <li><a href="#" class="footer-link">Privacy Policy</a></li>
+            <li><a href="#" class="footer-link">Cookie Policy</a></li>
+            <li><a href="#" class="footer-link">Termini di Servizio</a></li>
+          </ul>
+        </div>
+
+        <!-- Colonna 3 — Recapiti diretti -->
+        <div>
+          <p class="text-white text-sm font-semibold mb-4">Contatti Diretti</p>
+          <div class="space-y-3">
+            <div>
+              <p class="text-slate-500 text-xs uppercase tracking-wider mb-0.5">Telefono</p>
+              <a href="tel:+390541388100" class="text-slate-300 hover:text-white text-sm transition-colors">0541 388100</a>
+            </div>
+            <div>
+              <p class="text-slate-500 text-xs uppercase tracking-wider mb-0.5">Email</p>
+              <a href="mailto:info@termoidraulicaadriatica.it" class="text-slate-300 hover:text-white text-sm transition-colors">
+                info@termoidraulicaadriatica.it
+              </a>
+            </div>
+            <div>
+              <p class="text-slate-500 text-xs uppercase tracking-wider mb-0.5">Orari Ufficio</p>
+              <p class="text-slate-300 text-sm">Lun–Ven: 8:00–12:00 / 14:00–18:00</p>
+              <p class="text-slate-500 text-xs mt-0.5">Pronto intervento: H24</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Riga copyright -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-slate-500 text-xs">
+          © 2025 Termoidraulica Adriatica. Tutti i diritti riservati.
+        </p>
+        <p class="text-slate-600 text-xs">
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+       Tre funzioni principali:
+       1. Sticky navbar — aggiunge/rimuove .scrolled allo scroll
+       2. Menu mobile — toggle apertura/chiusura hamburger
+       3. Form submit — simula invio e mostra messaggio di conferma
+  ============================================================ -->
+  <script>
+    /* ============================================================
+       1. STICKY NAVBAR
+       Ascolta lo scroll della pagina.
+       Se l'utente ha scrollato più di 80px: aggiunge .scrolled
+       alla navbar (sfondo bianco + blur + logo/link scuri).
+       Sopra 80px: rimuove .scrolled (navbar trasparente sull'hero).
+    ============================================================ */
+    const nav       = document.getElementById('main-nav');
+    const topBar    = document.getElementById('top-bar');
+    const iconOpen  = document.getElementById('icon-open');
+    const iconClose = document.getElementById('icon-close');
+
+    function updateNav() {
+      const scrollY = window.scrollY;
+
+      if (scrollY > 80) {
+        // Navbar scrollata: sfondo bianco, top=0 (nasconde top-bar)
+        nav.classList.add('scrolled');
+        // Aggiorna colori icone hamburger su sfondo bianco
+        iconOpen.classList.remove('text-white');
+        iconOpen.classList.add('text-navy');
+        iconClose.classList.remove('text-white');
+        iconClose.classList.add('text-navy');
+      } else {
+        // Navbar in cima: trasparente sull'hero scuro
+        nav.classList.remove('scrolled');
+        iconOpen.classList.add('text-white');
+        iconOpen.classList.remove('text-navy');
+        iconClose.classList.add('text-white');
+        iconClose.classList.remove('text-navy');
+      }
+    }
+
+    window.addEventListener('scroll', updateNav);
+    updateNav(); // esegui subito al caricamento
+
+
+    /* ============================================================
+       2. MENU MOBILE
+       Il click sull'hamburger mostra/nasconde il menu mobile.
+       Cambia anche l'icona da ☰ a ✕.
+    ============================================================ */
+    document.getElementById('menu-toggle').addEventListener('click', function () {
+      const menu = document.getElementById('mobile-menu');
+      const isOpen = menu.classList.contains('open');
+
+      if (isOpen) {
+        // Chiudi menu
+        menu.classList.remove('open');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      } else {
+        // Apri menu
+        menu.classList.add('open');
+        iconOpen.classList.add('hidden');
+        iconClose.classList.remove('hidden');
+      }
+    });
+
+    // Chiudi il menu mobile quando si clicca su un link interno
+    document.querySelectorAll('.mobile-nav-link').forEach(function (link) {
+      link.addEventListener('click', function () {
+        document.getElementById('mobile-menu').classList.remove('open');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      });
+    });
+
+
+    /* ============================================================
+       3. FORM SUBMIT (simulazione)
+       Valida i campi obbligatori e mostra un messaggio di
+       conferma verde. In produzione sostituire con fetch() verso
+       un endpoint backend o un servizio come Formspree.
+    ============================================================ */
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      // Raccolta valori
+      const nome    = document.getElementById('f-nome').value.trim();
+      const email   = document.getElementById('f-email').value.trim();
+      const tipo    = document.getElementById('f-tipo').value;
+      const privacy = document.getElementById('f-privacy').checked;
+
+      // Validazione base
+      if (!nome || !email || !tipo || !privacy) {
+        alert('Per favore compila tutti i campi obbligatori e accetta la Privacy Policy.');
+        return;
+      }
+
+      // Simulazione invio — nasconde il pulsante e mostra conferma
+      document.getElementById('submit-btn').classList.add('hidden');
+      document.getElementById('form-success').classList.remove('hidden');
+    }
+
+
+    /* ============================================================
+       4. ANIMAZIONE FADE-IN-UP SULLO SCROLL
+       Usa IntersectionObserver per aggiungere .visible agli
+       elementi .fade-in-up quando entrano nel viewport.
+       Questo evita animazioni su elementi fuori schermo.
+    ============================================================ */
+    const observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // Smette di osservare dopo la prima animazione
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.12 // scatta quando il 12% dell'elemento è visibile
+    });
+
+    // Applica l'observer a tutti gli elementi con classe .fade-in-up
+    document.querySelectorAll('.fade-in-up').forEach(function (el) {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
