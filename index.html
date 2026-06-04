@@ -463,13 +463,12 @@
 
       <!-- Grid 4 colonne (2 su tablet, 1 su mobile) -->
       <!-- items-stretch: ogni card riempie l'intera altezza della riga della griglia,
-           quindi tutte le card della stessa riga sono alte uguale.
-           IMPORTANTE: l'animazione fade-in è applicata QUI, sul contenitore, e non
-           sulle singole card. Animando le card una per una con transition-delay
-           diversi (0.1s, 0.2s, 0.3s) sembravano sfalsate / di altezze diverse
-           durante l'ingresso nello schermo: ora salgono tutte insieme e restano
-           sempre perfettamente allineate. -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch fade-in-up">
+           quindi tutte le card della stessa riga sono SEMPRE alte uguale.
+           NB: qui NON usiamo l'animazione fade-in (translateY). Faceva "saltare"
+           il blocco all'ingresso nello schermo e, se l'animazione partiva a metà
+           scroll, le card sembravano disallineate / di altezze diverse. Senza
+           movimento le card sono stabili e perfettamente allineate da subito. -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
 
         <!-- Card 1 — Impianti Civili & Riscaldamento -->
         <!-- flex flex-col h-full: la card riempie la cella e impagina il contenuto
