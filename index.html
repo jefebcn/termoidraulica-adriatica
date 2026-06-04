@@ -16,42 +16,14 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
 
   <!-- ============================================================
-       TAILWIND CDN — solo per prototipo/bozza.
-       In produzione sostituire con build Tailwind CLI.
+       TAILWIND — CSS COMPILATO STATICO (assets/tailwind.css)
+       Sostituisce il vecchio CDN runtime (cdn.tailwindcss.com), che applicava
+       gli stili via JavaScript DOPO il render e processava il DOM in continuo:
+       era la causa del "ballare" (FOUC al caricamento e reflow ciclici da fermo).
+       Il CSS statico è applicato dal primo paint: niente scatti, niente loop.
+       Palette/font custom sono in tailwind.config.js e già inclusi qui dentro.
   ============================================================ -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- ============================================================
-       TAILWIND CONFIG: estensione del tema con la palette e i font
-       custom di Termoidraulica Adriatica.
-  ============================================================ -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            /* Colore primario — Navy profondo: autorità e solidità */
-            navy:    '#0F172A',
-            /* Colore secondario — Blu idraulico/tecnologico */
-            tech:    '#1D4ED8',
-            'tech-light': '#3B82F6',
-            /* Colore accento — Verde smeraldo: eco, rinnovabili */
-            eco:     '#10B981',
-            'eco-dark':  '#059669',
-            /* Grigi neutri per sfondi e testi secondari */
-            slate50: '#F8FAFC',
-            slate100:'#F1F5F9',
-            slate400:'#94A3B8',
-            slate600:'#475569',
-          },
-          fontFamily: {
-            sans:    ['"DM Sans"', 'sans-serif'],
-            display: ['"DM Serif Display"', 'serif'],
-          },
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="assets/tailwind.css" />
 
   <!-- ============================================================
        STILI CUSTOM — tutto ciò che Tailwind non copre nativamente:
@@ -463,11 +435,15 @@
     </div>
 
     <!-- Freccia scroll-down animata -->
+    <!-- FIX: questo <a> era chiuso con </div> (tag errato). L'anchor restava
+         "aperto" e il parser HTML ne creava copie fantasma su tutta la pagina;
+         avendo animate-bounce, quelle copie giganti rimbalzavano all'infinito
+         facendo "saltare" il contenuto di continuo. Ora chiuso con </a>. -->
     <a href="#azienda" aria-label="Scorri verso il basso" class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce cursor-pointer">
       <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path d="M19 9l-7 7-7-7"/>
       </svg>
-    </div>
+    </a>
   </section>
 
 
