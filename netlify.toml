@@ -1,0 +1,15 @@
+# ============================================================
+# Configurazione Netlify — SITO STATICO
+# index.html è autosufficiente: il CSS Tailwind è già incorporato
+# dentro la pagina, quindi NON serve nessuna build.
+# Diciamo a Netlify di non eseguire build e di pubblicare la cartella
+# root (dove sta index.html). Così la presenza di package.json non fa
+# partire una build che, fallendo, lascerebbe online la versione vecchia.
+# ============================================================
+[build]
+  command = "echo 'Sito statico: nessuna build necessaria'"
+  publish = "."
+
+# Evita che Netlify installi dipendenze inutilmente
+[build.environment]
+  NETLIFY_SKIP_NPM_INSTALL = "true"
