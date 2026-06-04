@@ -126,29 +126,57 @@
       border-right: 1px solid rgba(15,23,42,0.08);
     }
 
-    /* ---- CARD SERVIZI ---- */
-    /* height:100% garantisce che ogni card occupi tutta l'altezza
-       della riga della griglia, indipendentemente dal contenuto */
-    .service-card {
-      border: 1px solid #F1F5F9;
-      height: 100%;
+    /* ---- CARD SERVIZI (riscritte da zero) ---- */
+    /* Griglia: 1 colonna su mobile, 2 su tablet, 4 su desktop.
+       align-items:stretch (default) + height:100% sulle card => tutte le
+       card di una riga hanno SEMPRE la stessa altezza. */
+    .svc-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+    @media (min-width: 640px)  { .svc-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .svc-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    /* La singola card: colonna flessibile, altezza piena della cella.
+       min-height dà un pavimento stabile: anche mentre i font si caricano
+       (o se il testo cambia) la card non "salta" cambiando altezza. */
+    .svc-card {
       display: flex;
       flex-direction: column;
+      height: 100%;
+      min-height: 17rem;
+      background: #fff;
+      border: 1px solid #F1F5F9;
+      border-radius: 1rem;
+      padding: 1.75rem;
       transition: box-shadow 0.25s ease, border-color 0.25s ease;
     }
-    /* Hover SENZA spostamento: niente translateY, così le card non "saltano".
-       Sollevando la card di qualche px il cursore poteva uscire dal bordo
-       inferiore, disattivare l'hover e innescare un tremolio a ripetizione.
-       Diamo feedback solo con ombra + bordo verde, che non spostano il layout. */
-    .service-card:hover {
+    /* Hover SENZA spostamento: solo ombra + bordo verde. Nessun transform,
+       così le card non si sollevano e non innescano tremolii. */
+    .svc-card:hover {
       box-shadow: 0 12px 40px rgba(15,23,42,0.10);
       border-color: #10B981;
     }
-    /* Icona cerchio colorato nelle card */
-    .icon-wrap {
+    .svc-icon {
       width: 3rem; height: 3rem;
       border-radius: 0.75rem;
       display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .svc-title { color: #0F172A; font-weight: 600; font-size: 1.125rem; line-height: 1.35; margin-bottom: 0.5rem; }
+    .svc-text  { color: #475569; font-size: 0.875rem; line-height: 1.6; }
+    /* margin-top:auto ancora il tag SEMPRE in fondo alla card, qualunque sia
+       la lunghezza del testo sopra. */
+    .svc-tag {
+      margin-top: auto;
+      align-self: flex-start;
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
     }
 
     /* ---- SEZIONE INCENTIVI ---- */
@@ -464,82 +492,80 @@
         </p>
       </div>
 
-      <!-- Grid 4 colonne (2 su tablet, 1 su mobile) -->
-      <!-- items-stretch: ogni card riempie l'intera altezza della riga della griglia,
-           quindi tutte le card della stessa riga sono SEMPRE alte uguale.
-           NB: qui NON usiamo l'animazione fade-in (translateY). Faceva "saltare"
-           il blocco all'ingresso nello schermo e, se l'animazione partiva a metà
-           scroll, le card sembravano disallineate / di altezze diverse. Senza
-           movimento le card sono stabili e perfettamente allineate da subito. -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+      <!-- ============================================================
+           GRIGLIA SERVIZI — RISCRITTA DA ZERO
+           Niente animazioni, niente transform/hover che spostano: le card
+           sono statiche. .svc-grid impagina 1/2/4 colonne; ogni .svc-card
+           ha height:100% + min-height, quindi le card di una riga sono
+           sempre alte uguale e non "saltano". Il tag in fondo è ancorato
+           con margin-top:auto (classe .svc-tag).
+      ============================================================ -->
+      <div class="svc-grid">
 
         <!-- Card 1 — Impianti Civili & Riscaldamento -->
-        <!-- flex flex-col h-full: la card riempie la cella e impagina il contenuto
-             in colonna, così il tag colorato può restare ancorato in fondo -->
-        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
-          <div class="icon-wrap bg-blue-50 mb-5">
-            <svg class="w-6 h-6 text-tech" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <article class="svc-card">
+          <div class="svc-icon" style="background:#EFF6FF">
+            <svg class="w-6 h-6" style="color:#1D4ED8" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
               <path d="M12 6v6l4 2"/>
             </svg>
           </div>
-          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Impianti Civili<br/>& Riscaldamento</h3>
-          <!-- flex-1: il testo occupa tutto lo spazio disponibile, spingendo il tag sempre in fondo -->
-          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+          <h3 class="svc-title">Impianti Civili &amp; Riscaldamento</h3>
+          <p class="svc-text">
             Caldaie a condensazione, riscaldamento a pavimento, sostituzione generatori
             e manutenzione periodica certificata.
           </p>
-          <span class="mt-5 inline-block text-xs font-semibold text-tech bg-blue-50 px-3 py-1 rounded-full self-start">Residenziale</span>
-        </div>
+          <span class="svc-tag" style="color:#1D4ED8;background:#EFF6FF">Residenziale</span>
+        </article>
 
         <!-- Card 2 — Climatizzazione & Trattamento Aria -->
-        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
-          <div class="icon-wrap bg-sky-50 mb-5">
-            <svg class="w-6 h-6 text-sky-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <article class="svc-card">
+          <div class="svc-icon" style="background:#F0F9FF">
+            <svg class="w-6 h-6" style="color:#0EA5E9" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/>
             </svg>
           </div>
-          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Climatizzazione<br/>& Trattamento Aria</h3>
-          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+          <h3 class="svc-title">Climatizzazione &amp; Trattamento Aria</h3>
+          <p class="svc-text">
             Sistemi di condizionamento residenziali e industriali ad alta efficienza.
             VMC e purificazione aria per ambienti di lavoro.
           </p>
-          <span class="mt-5 inline-block text-xs font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full self-start">Civile & Industriale</span>
-        </div>
+          <span class="svc-tag" style="color:#0284C7;background:#F0F9FF">Civile &amp; Industriale</span>
+        </article>
 
         <!-- Card 3 — Energie Rinnovabili & Green -->
-        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
-          <div class="icon-wrap bg-green-50 mb-5">
-            <svg class="w-6 h-6 text-eco" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <article class="svc-card">
+          <div class="svc-icon" style="background:#ECFDF5">
+            <svg class="w-6 h-6" style="color:#10B981" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <path d="M12 22V12M12 12C12 7 17 4 17 4s-1 8-5 8zM12 12C12 7 7 4 7 4s1 8 5 8z"/>
               <path d="M5 22h14"/>
             </svg>
           </div>
-          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Energie Rinnovabili<br/>& Green</h3>
-          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+          <h3 class="svc-title">Energie Rinnovabili &amp; Green</h3>
+          <p class="svc-text">
             Pompe di calore, solare termico e fotovoltaico. Massimo risparmio in bolletta
             con gli incentivi fiscali vigenti.
           </p>
-          <span class="mt-5 inline-block text-xs font-semibold text-eco bg-green-50 px-3 py-1 rounded-full self-start">Ecosostenibile</span>
-        </div>
+          <span class="svc-tag" style="color:#059669;background:#ECFDF5">Ecosostenibile</span>
+        </article>
 
         <!-- Card 4 — Impianti Industriali & Condominiali -->
-        <div class="service-card bg-white rounded-2xl p-7 flex flex-col h-full">
-          <div class="icon-wrap bg-orange-50 mb-5">
-            <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <article class="svc-card">
+          <div class="svc-icon" style="background:#FFF7ED">
+            <svg class="w-6 h-6" style="color:#F97316" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
               <rect x="2" y="7" width="20" height="14" rx="1"/>
               <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
               <line x1="12" y1="12" x2="12" y2="16"/>
               <line x1="10" y1="14" x2="14" y2="14"/>
             </svg>
           </div>
-          <h3 class="text-navy font-semibold text-lg mb-2 leading-snug">Impianti Industriali<br/>& Condominiali</h3>
-          <p class="text-slate-600 text-sm leading-relaxed flex-1">
+          <h3 class="svc-title">Impianti Industriali &amp; Condominiali</h3>
+          <p class="svc-text">
             Soluzioni complesse per aziende, hotel e gestione di centrali termiche
             condominiali. Contratti di manutenzione annuali.
           </p>
-          <span class="mt-5 inline-block text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full self-start">B2B & Condomini</span>
-        </div>
+          <span class="svc-tag" style="color:#EA580C;background:#FFF7ED">B2B &amp; Condomini</span>
+        </article>
 
       </div>
     </div>
