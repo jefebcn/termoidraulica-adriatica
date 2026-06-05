@@ -91,13 +91,13 @@
       min-height: 100vh;
       display: flex;
       align-items: center;
-      /* Immagine hero a tema idraulico/termico: impianto di riscaldamento a
-         pavimento (tubazioni). Sopra c'è un overlay scuro navy->blu, quindi se
-         per qualunque motivo l'immagine non caricasse, resta comunque il
-         gradiente (nessuna immagine "rotta"). */
+      /* Immagine hero: foto reale di un tecnico al lavoro su un impianto
+         termoidraulico, fornita dal cliente e INCORPORATA nel sito
+         (assets/hero.jpg) — nessuna dipendenza da server esterni, non può
+         rompersi. Sopra c'è l'overlay scuro navy->blu per la leggibilità. */
       background-image:
         linear-gradient(135deg, rgba(15,23,42,0.88) 0%, rgba(15,23,42,0.60) 55%, rgba(29,78,216,0.35) 100%),
-        url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80&auto=format&fit=crop');
+        url('assets/hero.jpg');
       background-size: cover;
       background-position: center;
     }
